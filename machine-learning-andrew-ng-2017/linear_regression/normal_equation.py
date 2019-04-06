@@ -49,3 +49,6 @@ theta_norm = np.mat(X.T.dot(X)).I.dot(X.T).dot(y)
 print("fact: %s"%theta_)
 print("gradient descent ans: %s"%theta)
 print("norm equation ans: %s" %theta_norm)
+
+print("the shortcoming of norm equation is that it become computation heavy when num of \
+feature a rise rapidly.say over 10000 dim features.")
