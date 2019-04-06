@@ -3,12 +3,12 @@
 # @Time    : 2019/4/1 22:50
 # @Author  : Leon
 # @Site    : 
-# @File    : data_generator.py
+# @File    : single_feature_linear_regression_gradient_descent.py
 
 import numpy as np
 import matplotlib.pyplot as plt
 
-# 1. generate data
+# 1. generate data based on distribution: y = θ_1 * x + θ_0 + noise
 X = np.linspace(0, 10, 400)
 Y = 0.345 + 3.235 * X  + np.random.normal(0, 3, 400)
 
