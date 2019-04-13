@@ -26,6 +26,7 @@ print (input)
 def km(input):
     pass
 
+# basic heuristic by randomly choosing answer
 def heuristic(input,iter=100):
     better_score = 0.0
     better_ans = None
