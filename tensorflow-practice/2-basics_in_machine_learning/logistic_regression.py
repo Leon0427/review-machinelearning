@@ -125,16 +125,31 @@ with graph.as_default():
                                                decay_steps,
                                                FLAGS.learning_rate_decay_factor,
                                                staircase=True,
-                                               name="exponential decay learning rate")
+                                               name="exponential_decay_learning_rate")
 
     ###############################################
     ########### Defining place holders ############
     ###############################################
     image_place = tf.placeholder(tf.float32, shape= ([None, num_features]),name= 'image')
     label_place = tf.placeholder(tf.int32, shape = ([None,]),name='gt')
+    print(label_place)
     label_one_hot = tf.one_hot(label_place, depth=FLAGS.num_classes, axis=-1)
+    print(label_one_hot)
     dropout_param = tf.placeholder(tf.float32)
 
     ##################################################
     ########### Model + Loss + Accuracy ##############
     ##################################################
+    logits = tf.contrib.layers.fully_connected(inputs=image_place, num_outputs=FLAGS.num_classes, scope='fc')
+    print(logits)
+
+    # Define loss
+    with tf.name_scope("loss"):
+        loss_tensor = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits_v2(logits=logits, labels=label_one_hot))
+
+    # Accuracy
+    # Evaluate the model
+    prediction_correct = tf.equal(tf.argmax(logits, 1), tf.argmax(label_one_hot, 1))
+
+    # Accuracy calculation
+    accuracy = tf.reduce_mean(tf.cast(prediction_correct, tf.float32))
