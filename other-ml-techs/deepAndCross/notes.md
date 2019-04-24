@@ -1,0 +1,2 @@
+1. the difference between deep & cross and deepFM lies in the way they cross the features: deep & cross cross every single numbers in the whole embedded input vector, deepFM make cross-feature by inner-multiply two fields' embeddings.
+2. deep & cross considers high order feature-crossing, while deepFM doesn't.
