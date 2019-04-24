@@ -1,0 +1,24 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+# @Time    : 2019/4/24 10:26
+# @Author  : liangxiao
+# @Site    : 
+# @File    : basics.py
+# @Software: PyCharm
+
+import numpy as np
+
+# Create a array
+a = np.random.randint(1,9,(4,2,5))
+b = np.full((4,2,5),3)
+c = np.eye(3,2)
+
+# get max/min
+min_of_a_0 = a.mean(axis=0) # output shape = (2,5)
+min_of_a_1 = a.mean(axis=1) # output shape = (4,5)
+min_of_a_2 = a.mean(axis=2) # output shape = (4,2)
+min_of_a = a.mean() # output is single number
+print(min_of_a)
+print(min_of_a_0)
+print(min_of_a_1)
+print(min_of_a_2)
