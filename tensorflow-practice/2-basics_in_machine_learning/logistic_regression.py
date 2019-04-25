@@ -153,3 +153,121 @@ with graph.as_default():
 
     # Accuracy calculation
     accuracy = tf.reduce_mean(tf.cast(prediction_correct, tf.float32))
+
+    #############################################
+    ########### training operation ##############
+    #############################################
+
+    # Define optimizer by its default values
+    optimizer = tf.train.AdamOptimizer(learning_rate=learning_rate)
+
+    # 'train_op' is a operation that is run for gradient update on parameters.
+    # Each execution of 'train_op' is a training step.
+    # By passing 'global_step' to the optimizer, each time that the 'train_op' is run, Tensorflow
+    # update the 'global_step' and increment it by one!
+
+    # gradient update
+    with tf.name_scope('train_op'):
+        gradient_and_variables = optimizer.compute_gradients(loss_tensor)
+        train_op = optimizer.apply_gradients(gradient_and_variables, global_step=global_step)
+
+    ############################################
+    ############ Run the Session ###############
+    ############################################
+    sess_config = tf.ConfigProto(
+        allow_soft_placement=FLAGS.all_soft_placement,
+        log_device_placement=FLAGS.log_device_placement)
+    sess = tf.Session(graph=graph, config=sess_config)
+
+    with sess.as_default():
+
+        # the saver op.
+        saver = tf.train.Saver()
+
+        # Initialize all variables
+        sess.run(tf.global_variables_initializer())
+
+        # the prefix for checkpoint files
+        checkpoint_prefix = 'model'
+
+        # If fine-tuning flag is 'True', the model will be restored
+        if FLAGS.fine_tuning:
+            saver.restore(sess, os.path.join(FLAGS.checkpoint_path, checkpoint_prefix))
+            print("Model restored for fine-tuning...")
+
+        ###################################################################
+        ########## Run the training and loop over the batches #############
+        ###################################################################
+
+        # go through the batches
+        test_accuracy = 0
+        for epoch in range(FLAGS.num_epochs):
+            total_batch_training = int(data['train/image'].shape[0] / FLAGS.batch_size)
+
+            # go through the batches
+            for batch_num in range(total_batch_training):
+                #################################################
+                ########## Get the training batches #############
+                #################################################
+                start_idx = batch_num * FLAGS.batch_size
+                end_idx = start_idx + FLAGS.batch_size
+
+                # Fit training with batch data
+                train_batch_data, train_batch_label = data['train/image'][start_idx:end_idx],data['train/label'][start_idx, end_idx]
+
+                ########################################
+                ########## Run the session #############
+                ########################################
+
+                # run optimization op(backprop) and calculate batch loss and accuracy
+                # when the tensor tensors['global_step'] is evaluated, it'll be incremented by 1.
+                batch_loss, _, training_step = sess.run(
+                    [loss_tensor, train_op, global_step],
+                    feed_dict={image_place:train_batch_data,
+                                label_place:train_batch_label,
+                                dropout_param:0.5})
+
+                ########################################
+                ########## Write summaries #############
+                ########################################
+
+            #################################################
+            ########## Plot the progressive bar #############
+            #################################################
+            print("Epoch" + str(epoch + 1) + ", Train Loss= " + \
+                  "{:.5f}".format(batch_loss))
+
+        ###########################################################
+        ############ Saving the model checkpoint ##################
+        ###########################################################
+
+        # # the model will be saved when then training is done
+
+        # create the path for saving the checkpoints.
+        if not os.path.exists(FLAGS.checkpoint_path):
+            os.mkdir(FLAGS.checkpoint_path)
+
+        # save the model
+        save_path = saver.save(sess, os.path.join(FLAGS.checkpoint_path, checkpoint_prefix))
+        print("Model saved in file: %s" % save_path)
+
+        ############################################################################
+        ########## Run the session for pur evaluation on the test data #############
+        ############################################################################
+
+        # The prefix for checkpoint files
+        checkpoint_prefix = 'model'
+
+        # Restoring the saved files
+        saver.restore(sess, os.path.join(FLAGS.checkpoint_path, checkpoint_prefix))
+        print("Model restored...")
+
+        # Evaluation of the model
+        test_accuracy = 100*sess.run(accuracy, feed_dict={
+            image_place:data['test/image'],
+            label_place:data['test/label'],
+            dropout_param:1.
+        })
+
+        print("Final Test Accuracy is %% %.2f" % test_accuracy)
+
