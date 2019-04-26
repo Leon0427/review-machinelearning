@@ -13,7 +13,6 @@ import tempfile
 import urllib
 import pandas as pd
 import os
-from tensorflow.examples.tutorials.mnist import input_data
 from keras.datasets import mnist
 
 
@@ -82,6 +81,8 @@ data={}
 train_image.resize([train_image.shape[0],train_image.shape[1]*train_image.shape[2]])
 test_image.resize([test_image.shape[0],test_image.shape[1]*test_image.shape[2]])
 data['train/image'],data['train/label'],data['test/image'],data['test/label'] = train_image, train_label, test_image, test_label
+# if you print , the shape of train/test set is (60000, 784), (10000, 784)
+# print("training set shape: %s, test set shape: %s"%(data['train/image'].shape,data['test/image'].shape))
 
 # only extract 1 or 0
 def extract_samples_Fn(data):
@@ -100,12 +101,15 @@ data['train/image'] = data['train/image'][index_list_train]
 data['train/label'] = data['train/label'][index_list_train]
 data['test/image'] = data['test/image'][index_list_test]
 data['test/label'] = data['test/label'][index_list_test]
+print("training set shape: %s, test set shape: %s"%(data['train/image'].shape,data['test/image'].shape))
+print(np.count_nonzero(data['train/label']), np.count_nonzero(data['test/label']))
 
 dimension_of_train = data['train/image'].shape
 # print(demension_of_train)
 
 num_train_samples = dimension_of_train[0]
 num_features = dimension_of_train[1]
+print("train_sample_num: %s, num_features: %s" % (num_train_samples, num_features))
 
 #######################################
 ########## Defining Graph ############
@@ -116,10 +120,13 @@ with graph.as_default():
     ########### Parameters ############
     ###################################
 
+    # every batch global_step += 1
     global_step = tf.Variable(0,name="global_step", trainable=False)
 
+    # every decay_steps of global_step there will be a decay
     decay_steps = int(num_train_samples / FLAGS.batch_size * FLAGS.num_epochs_per_decay)
 
+    # every decay_steps of global_step decay FLAGS.learning_rate_decay_factor
     learning_rate = tf.train.exponential_decay(FLAGS.initial_learning_rate,
                                                global_step,
                                                decay_steps,
@@ -175,7 +182,7 @@ with graph.as_default():
     ############ Run the Session ###############
     ############################################
     sess_config = tf.ConfigProto(
-        allow_soft_placement=FLAGS.all_soft_placement,
+        allow_soft_placement=FLAGS.allow_soft_placement,
         log_device_placement=FLAGS.log_device_placement)
     sess = tf.Session(graph=graph, config=sess_config)
 
@@ -213,7 +220,7 @@ with graph.as_default():
                 end_idx = start_idx + FLAGS.batch_size
 
                 # Fit training with batch data
-                train_batch_data, train_batch_label = data['train/image'][start_idx:end_idx],data['train/label'][start_idx, end_idx]
+                train_batch_data, train_batch_label = data['train/image'][start_idx:end_idx],data['train/label'][start_idx: end_idx]
 
                 ########################################
                 ########## Run the session #############
