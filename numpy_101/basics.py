@@ -22,3 +22,20 @@ print(min_of_a)
 print(min_of_a_0)
 print(min_of_a_1)
 print(min_of_a_2)
+
+# get sum
+sum_of_a_0 = a.sum(axis=0)
+sum_of_a_1 = a.sum(axis=1)
+sum_of_a_2 = a.sum(axis=2)
+print(sum_of_a_0)
+print(sum_of_a_1)
+print(sum_of_a_2)
+
+# diag
+print("-------- diag ---------")
+diag_1 = np.diag(range(1,4),1)
+diag_2 = np.diag(range(1,4),0)
+diag_3 = np.diag(range(1,4),2)
+print(diag_1)
+print(diag_2)
+print(diag_3)
