@@ -20,7 +20,7 @@ def get_val_and_cost(shape=(300,200)):
     cost = 1 - val
     return val,cost
 
-val,cost = get_val_and_cost((300,300))
+val,cost = get_val_and_cost((3000,300))
 time1 = time.time()
 print(time1)
 ans1 = linear_sum_assignment(cost)

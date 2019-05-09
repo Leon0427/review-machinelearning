@@ -1,4 +1,4 @@
-## Logistic Regression
+ ## Logistic Regression
 
 ### 1. cost function
 cost(h,y) = -log(h), y=1; -log(1-h),y=0;
